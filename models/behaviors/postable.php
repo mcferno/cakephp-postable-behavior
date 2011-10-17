@@ -2,7 +2,7 @@
 /**
  * CakePHP Postable Behavior
  * @author Patrick McFern <mcferno AT gmail.com>
- * @source https://github.com/mcferno/cakephp-postable
+ * @source https://github.com/mcferno/cakephp-postable-behavior
  * 
  * Allows you to map data from one or more models to a central model/table
  * which maintains an index of common fields. The resulting set of data can be 
