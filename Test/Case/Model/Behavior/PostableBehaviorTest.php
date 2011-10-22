@@ -1,6 +1,7 @@
 <?php
-App::import('Core', array('AppModel', 'Model'));
-require_once dirname(__FILE__) . DS . 'models.php';
+App::uses('Model', 'Model');
+App::uses('AppModel', 'Model');
+require_once dirname(dirname(__FILE__)) . DS . 'models.php';
 
 class PostableBehaviorTest extends CakeTestCase {
 
@@ -57,7 +58,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the default behavior save + find, no options.
 	 */
 	public function testDefaultOptions() {
-		$this->Book->Behaviors->attach('postable.postable',array());
+		$this->Book->Behaviors->load('Postable.Postable',array());
 		$this->_resaveFixtures($this->Book);
 				
 		// only direct column name matches are recorded
@@ -87,7 +88,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests that the storage model stays up to date following an edit.
 	 */
 	public function testSaveUpdate() {		
-		$this->Book->Behaviors->attach('postable.postable',array());
+		$this->Book->Behaviors->load('Postable.Postable',array());
 		$this->_resaveFixtures($this->Book);
 		
 		$expecting = array(
@@ -102,11 +103,13 @@ class PostableBehaviorTest extends CakeTestCase {
 		);
 				
 		$updateData = array(
-			'id' => 1,
-			'title' => 'This has changed'
+			'Book' => array(
+				'id' => 1,
+				'title' => 'This has changed'
+			)
 		);
 		
-		$this->assertTrue($this->Book->save($updateData));
+		$this->assertEqual($this->Book->save($updateData),$updateData);
 				
 		$result = $this->Post->find('first',array('conditions'=>array(
 			'model'=>'Book',
@@ -123,7 +126,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests that the storage model stays up to date following a saveAll.
 	 */
 	public function testSaveAllUpdate() {		
-		$this->Book->Behaviors->attach('postable.postable',array());
+		$this->Book->Behaviors->load('Postable.Postable',array());
 		$this->_resaveFixtures($this->Book);
 				
 		// updates to existing record
@@ -188,7 +191,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the storageModel option.
 	 */
 	public function testStorageModelOption() {
-		$this->Book->Behaviors->attach('postable.postable',array(
+		$this->Book->Behaviors->load('Postable.Postable',array(
 			'storageModel' => 'NonDefaultStorageModel'
 		));
 		$this->_resaveFixtures($this->Book);
@@ -222,7 +225,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	public function testInvalidStorageModel() {
 		$this->expectError();
 		
-		$this->Book->Behaviors->attach('postable.postable',array(
+		$this->Book->Behaviors->load('Postable.Postable',array(
 			'storageModel' => 'InvalidStorageModel'
 		));
 	}
@@ -231,7 +234,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests basic column name-based mapping option.
 	 */
 	public function testNameMappingOption() {
-		$this->Book->Behaviors->attach('postable.postable',array(
+		$this->Book->Behaviors->load('Postable.Postable',array(
 			'mapping' => array(
 				'region' => 'country'
 			)
@@ -264,7 +267,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the column exclusion mapping option
 	 */
 	public function testMappingExclusionOption() {
-		$this->Book->Behaviors->attach('postable.postable',array(
+		$this->Book->Behaviors->load('Postable.Postable',array(
 			'mapping' => array(
 				'title' => false
 			)
@@ -297,7 +300,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 */
 	public function testMappingCallbackOptionColumnExists() {
 		$BookWithDefaultCallback =& new BookWithDefaultCallback();
-		$BookWithDefaultCallback->Behaviors->attach('postable.postable',array(
+		$BookWithDefaultCallback->Behaviors->load('Postable.Postable',array(
 			'mapping' => array(
 				'title' => true
 			)
@@ -332,7 +335,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 */
 	public function testMappingCallbackOptionColumnDoesntExists() {
 		$BookWithDefaultCallback =& new BookWithDefaultCallback();
-		$BookWithDefaultCallback->Behaviors->attach('postable.postable',array(
+		$BookWithDefaultCallback->Behaviors->load('Postable.Postable',array(
 			'mapping' => array(
 				'author' => true
 			)
@@ -367,7 +370,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 */
 	public function testNonDefaultMappingCallbackOption() {
 		$BookWithNonDefaultCallback =& new BookWithNonDefaultCallback();
-		$BookWithNonDefaultCallback->Behaviors->attach('postable.postable',array(
+		$BookWithNonDefaultCallback->Behaviors->load('Postable.Postable',array(
 			'mapping' => array(
 				'title' => true
 			),
@@ -402,7 +405,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 */
 	public function testInclusionCallbackOption() {
 		$BookWithInclusionCallback =& new BookWithInclusionCallback();		
-		$BookWithInclusionCallback->Behaviors->attach('postable.postable',array(
+		$BookWithInclusionCallback->Behaviors->load('Postable.Postable',array(
 			'inclusionCallback' => 'postableInclusionCallback'
 		));
 		$this->_resaveFixtures($BookWithInclusionCallback);
@@ -435,7 +438,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the updating of the storage model on deletion.
 	 */
 	public function testOnDeletionUpdate() {
-		$this->Book->Behaviors->attach('postable.postable');
+		$this->Book->Behaviors->load('Postable.Postable');
 		$this->_resaveFixtures($this->Book);
 		
 		$find_query = array('conditions'=>array(
@@ -452,14 +455,14 @@ class PostableBehaviorTest extends CakeTestCase {
 		
 		// test that the same query will now yeild no records
 		$after = $this->Post->find('first',$find_query);
-		$this->assertEqual($after,array());
+		$this->assertFalse($after);
 	}
 	
 	/**
 	 * Tests the updating of the storage model on deletion via deleteAll
 	 */
 	public function testOnDeleteAllUpdate() {
-		$this->Book->Behaviors->attach('postable.postable');
+		$this->Book->Behaviors->load('Postable.Postable');
 		$this->_resaveFixtures($this->Book);
 		
 		$find_query = array('conditions'=>array(
@@ -476,7 +479,7 @@ class PostableBehaviorTest extends CakeTestCase {
 		
 		// test that the same query will now yeild no records
 		$after = $this->Post->find('first',$find_query);
-		$this->assertEqual($after,array());
+		$this->assertFalse($after);
 	}
 	
 	/**
@@ -485,8 +488,8 @@ class PostableBehaviorTest extends CakeTestCase {
 	public function testMultipleModelMixing() {
 		$Report =& new Report();
 		
-		$this->Book->Behaviors->attach('postable.postable');
-		$Report->Behaviors->attach('postable.postable');
+		$this->Book->Behaviors->load('Postable.Postable');
+		$Report->Behaviors->load('Postable.Postable');
 		
 		$this->_resaveFixtures($this->Book);
 		$this->_resaveFixtures($Report);
