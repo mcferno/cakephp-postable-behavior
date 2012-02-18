@@ -272,7 +272,7 @@ class PostableBehavior extends ModelBehavior {
 					$Model->set($record[$Model->alias]);
 									
 					// simulate an afterSave
-					$Model->Behaviors->trigger($Model,'afterSave',array(true));
+					$Model->Behaviors->trigger('afterSave', array(&$Model, true));
 				}
 				
 				// calculate the number of remaining records to process

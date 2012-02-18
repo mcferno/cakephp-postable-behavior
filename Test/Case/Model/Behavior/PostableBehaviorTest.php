@@ -536,7 +536,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the refreshing of the storage model data
 	 */
 	public function testRefreshPostableIndex() {
-		$this->Book->Behaviors->attach('postable.postable');
+		$this->Book->Behaviors->load('Postable.Postable');
 		
 		// confirm we don't have any records before refreshing
 		$empty = $this->Post->find('all');
@@ -589,7 +589,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the refreshing of the storage model data with a limit
 	 */
 	public function testRefreshPostableIndexWithLimit() {
-		$this->Book->Behaviors->attach('postable.postable');
+		$this->Book->Behaviors->load('Postable.Postable');
 		
 		// confirm we don't have any records before refreshing
 		$empty = $this->Post->find('all');
