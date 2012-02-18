@@ -528,5 +528,110 @@ class PostableBehaviorTest extends CakeTestCase {
 		
 		$this->assertEqual($result, $expecting);
 	}
+	
+	/**
+	 * Tests the refreshing of the storage model data
+	 */
+	public function testRefreshPostableIndex() {
+		$this->Book->Behaviors->attach('postable.postable');
+		
+		// confirm we don't have any records before refreshing
+		$empty = $this->Post->find('all');
+		$this->assertEqual($empty, array());
+		
+		$expecting = array(
+			array(
+				'Post' => array(
+					'id' => 1,
+					'model' => 'Book',
+					'foreign_key' => 1,
+					'title' => 'Title One',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color One'
+				)
+        	),
+			array(
+				'Post' => array(
+					'id' => 2,
+					'model' => 'Book',
+					'foreign_key' => 2,
+					'title' => 'Title Two',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color Two'
+				)
+        	),
+			array(
+				'Post' => array(
+					'id' => 3,
+					'model' => 'Book',
+					'foreign_key' => 3,
+					'title' => 'Title Three',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color Three'
+				)
+        	),
+        );
+		
+		$this->Book->refreshPostableIndex();
+		
+		$result = $this->Post->find('all',array('order'=>'id'));
+		
+		$this->assertEqual($result, $expecting);
+	}
+	
+	/**
+	 * Tests the refreshing of the storage model data with a limit
+	 */
+	public function testRefreshPostableIndexWithLimit() {
+		$this->Book->Behaviors->attach('postable.postable');
+		
+		// confirm we don't have any records before refreshing
+		$empty = $this->Post->find('all');
+		$this->assertEqual($empty, array());
+		
+		$expecting = array(
+			array(
+				'Post' => array(
+					'id' => 1,
+					'model' => 'Book',
+					'foreign_key' => 1,
+					'title' => 'Title One',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color One'
+				)
+        	),
+			array(
+				'Post' => array(
+					'id' => 2,
+					'model' => 'Book',
+					'foreign_key' => 2,
+					'title' => 'Title Two',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color Two'
+				)
+        	),
+			array(
+				'Post' => array(
+					'id' => 3,
+					'model' => 'Book',
+					'foreign_key' => 3,
+					'title' => 'Title Three',
+					'author' => '',
+					'region' => '',
+					'color' => 'Color Three'
+				)
+        	),
+        );
+		
+		$this->Book->refreshPostableIndex(1);
+		
+		$result = $this->Post->find('all',array('order'=>'id'));
+		$this->assertEqual($result, $expecting);
+	}
 }
 ?>
