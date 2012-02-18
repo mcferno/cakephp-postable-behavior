@@ -1,0 +1,45 @@
+/**
+ * CakePHP Postable Behavior
+ * @author Patrick McFern <mcferno AT gmail.com>
+ * @source https://github.com/mcferno/cakephp-postable-behavior
+ * 
+ * Allows you to map data from one or more models to a central model/table
+ * which maintains an index of common fields. The resulting set of data can be 
+ * manipulated in an abstract fashion, allowing you to blur the differences
+ * between different types of data.
+ * 
+ * Settings:
+ * 
+ * - storageModel : default 'Post'. 
+ *     Name of the model which will be instantiated and used as the storage for 
+ *     the common data. This model should never use this behavior.
+ * 
+ * - mapping :
+ *     By default, the field name of all non-essential columns in the 
+ *     storage model will be used as-is to find matches in other models using
+ *     the behavior. This is used to override the mapping for a specific model.
+ * 
+ *     Format : array('columnNameInStorageModel' => 'fieldNameInSourceModel')
+ * 
+ *     If a columnName is assigned `false`, it will be ignored during mapping.
+ *     If a columnName is assigned `true`, it will invoke a Model callback to 
+ *       handle the data assignment (below).
+ * 
+ * - mappingCallback : default 'postableMappingCallback'
+ *     The model callback function used to map data. This allows the model to 
+ *     manipulate the data as needed before it is recorded in the storage model.
+ *     To enable this callback, set the mapping to `true` for a column (above)
+ *     
+ *     Syntax : postableMappingCallback(columnName, modelData);
+ * 
+ *     The callback should return data for the specific columnName in a saveable
+ *     format.
+ * 
+ * - inclusionCallback : default `null`
+ *     The model callback function used to determine whether or not a specific
+ *     record should be included in the storage model.
+ * 
+ *     Syntax : postableInclusionCallback(modelData);
+ * 
+ *     The callback should return true (use) or false (omit) 
+ */
