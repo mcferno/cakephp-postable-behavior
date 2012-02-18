@@ -232,4 +232,53 @@ class PostableBehavior extends ModelBehavior {
 			$this->storageModel->delete($existing[$this->storageModel->alias]['id']);
 		}
 	}
+	
+	/**
+	 * Iterates through the data for the current model and refreshed the storage 
+	 * model. Useful if the behavior is added after data has already been 
+	 * populated, or when the behavior settings have been changed.
+	 * 
+	 * This is a costly operation and should be used seldomly.
+	 * 
+	 * @param {Model} $Model we're operating on.
+	 * @param {Integer} $limit the number of records to process at once
+	 */
+	public function refreshPostableIndex(&$Model, $limit = false) {
+		
+		// remove all currently indexed data for this model
+		if($this->storageModel->deleteAll("`{$this->storageModel->alias}`.`model` = '{$Model->alias}'")) {
+			
+			$numRows = $Model->find('count');
+			
+			// nothing to re-index, early success
+			if($numRows === 0) {
+				return true;
+			}
+			
+			$numProcessed = 0;
+			
+			while($numRows > 0) {
+				
+				$options = array();
+				if($limit !== false) {
+					$options['limit'] = "{$numProcessed},{$limit}";
+				}
+				
+				// rebuild the index by simulating an afterSave for all records
+				$records = $Model->find('all',$options);
+							
+				foreach($records as &$record) {
+					$Model->create();
+					$Model->set($record[$Model->alias]);
+									
+					// simulate an afterSave
+					$Model->Behaviors->trigger($Model,'afterSave',array(true));
+				}
+				
+				// calculate the number of remaining records to process
+				$numRows = ($limit === false) ? 0 : $numRows - $limit;
+				$numProcessed += $limit;
+			}
+		}
+	}
 }
