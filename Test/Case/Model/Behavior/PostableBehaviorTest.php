@@ -455,7 +455,7 @@ class PostableBehaviorTest extends CakeTestCase {
 		
 		// test that the same query will now yeild no records
 		$after = $this->Post->find('first',$find_query);
-		$this->assertFalse($after);
+		$this->assertEmpty($after);
 	}
 	
 	/**
@@ -479,7 +479,7 @@ class PostableBehaviorTest extends CakeTestCase {
 		
 		// test that the same query will now yeild no records
 		$after = $this->Post->find('first',$find_query);
-		$this->assertFalse($after);
+		$this->assertEmpty($after);
 	}
 	
 	/**
