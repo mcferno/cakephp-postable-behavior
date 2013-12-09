@@ -14,7 +14,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Method executed before each test
 	 */
-	public function startTest() {
+	public function startTest($method) {
 		$this->Post =& new Post();
 		$this->Book =& new Book();
 	}
@@ -22,7 +22,7 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Method executed after each test
 	 */
-	public function endTest() {
+	public function endTest($method) {
 		unset($this->Post);
 		unset($this->Book);
 
@@ -631,7 +631,7 @@ class PostableBehaviorTest extends CakeTestCase {
         	),
         );
 		
-		$this->Book->refreshPostableIndex(1);
+		$this->Book->refreshPostableIndex();
 		
 		$result = $this->Post->find('all',array('order'=>'id'));
 		$this->assertEqual($result, $expecting);

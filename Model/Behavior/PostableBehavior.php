@@ -61,7 +61,7 @@ class PostableBehavior extends ModelBehavior {
 		'id','model','foreign_key'
 	);
 	
-	public function setup(&$Model, $settings = array()) {
+	public function setup(Model $Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
 			
 			// default settings
@@ -140,7 +140,7 @@ class PostableBehavior extends ModelBehavior {
 	 * @param {Model} $Model containing a populated this->data
 	 * @return {Array} mapped data
 	 */
-	protected function _assignFields(&$Model) {
+	protected function _assignFields($Model) {
 		
 		$data = array();
 		
@@ -170,7 +170,7 @@ class PostableBehavior extends ModelBehavior {
 	 * @param {Model} $Model
 	 * @param {boolean} $created Whether this is a save or an update
 	 */
-	public function afterSave(&$Model, $created) {
+	public function afterSave(Model $Model, $created, $options = array()) {
 		
 		// verify if an inclusion callback has been set and exists for this model
 		if(isset($this->settings[$Model->alias]['inclusionCallback']) && method_exists($Model,$this->settings[$Model->alias]['inclusionCallback'])) {
@@ -216,7 +216,7 @@ class PostableBehavior extends ModelBehavior {
 	 *
 	 * @param {Model} $Model we're operating on.
 	 */
-	public function afterDelete(&$Model) {
+	public function afterDelete(Model $Model) {
 		
 		// obtain the record from the storage model, if this deleted record was being indexed.
 		$existing = $this->storageModel->find('first',array(
@@ -243,7 +243,7 @@ class PostableBehavior extends ModelBehavior {
 	 * @param {Model} $Model we're operating on.
 	 * @param {Integer} $limit the number of records to process at once
 	 */
-	public function refreshPostableIndex(&$Model, $limit = false) {
+	public function refreshPostableIndex($Model, $limit = false) {
 		
 		// remove all currently indexed data for this model
 		if($this->storageModel->deleteAll("`{$this->storageModel->alias}`.`model` = '{$Model->alias}'")) {
