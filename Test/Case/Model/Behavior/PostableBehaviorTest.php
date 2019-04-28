@@ -41,7 +41,7 @@ class PostableBehaviorTest extends CakeTestCase
 	 *
 	 * @param Model $Model
 	 */
-	protected function _resaveFixtures(&$Model)
+	protected function resaveFixtures(&$Model)
 	{
 		$all_rows = $Model->find('all');
 		$Model->deleteAll(array('1 = 1'));
@@ -57,11 +57,11 @@ class PostableBehaviorTest extends CakeTestCase
 	{
 		$before = $this->Book->find('count');
 
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$after = $this->Book->find('count');
 
-		$this->assertEqual($before, $after);
+		$this->assertEquals($before, $after);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class PostableBehaviorTest extends CakeTestCase
 	public function testDefaultOptions()
 	{
 		$this->Book->Behaviors->load('Postable.Postable', array());
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		// only direct column name matches are recorded
 		$expecting = array(
@@ -92,7 +92,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class PostableBehaviorTest extends CakeTestCase
 	public function testSaveUpdate()
 	{
 		$this->Book->Behaviors->load('Postable.Postable', array());
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$expecting = array(
 			'Post' => array(
@@ -121,7 +121,7 @@ class PostableBehaviorTest extends CakeTestCase
 			)
 		);
 
-		$this->assertEqual($this->Book->save($updateData), $updateData);
+		$this->assertEquals($this->Book->save($updateData), $updateData);
 
 		$result = $this->Post->find('first', array('conditions' => array(
 			'model' => 'Book',
@@ -131,7 +131,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -140,7 +140,7 @@ class PostableBehaviorTest extends CakeTestCase
 	public function testSaveAllUpdate()
 	{
 		$this->Book->Behaviors->load('Postable.Postable', array());
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		// updates to existing record
 		$changes[] = array(
@@ -197,7 +197,7 @@ class PostableBehaviorTest extends CakeTestCase
 		$expecting[0]['Post']['id'] = $result[0]['Post']['id'];
 		$expecting[1]['Post']['id'] = $result[1]['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -208,7 +208,7 @@ class PostableBehaviorTest extends CakeTestCase
 		$this->Book->Behaviors->load('Postable.Postable', array(
 			'storageModel' => 'NonDefaultStorageModel'
 		));
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$expecting = array(
 			'NonDefaultStorageModel' => array(
@@ -230,7 +230,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['NonDefaultStorageModel']['id'] = $result['NonDefaultStorageModel']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -254,7 +254,7 @@ class PostableBehaviorTest extends CakeTestCase
 				'region' => 'country'
 			)
 		));
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$expecting = array(
 			'Post' => array(
@@ -275,7 +275,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -288,7 +288,7 @@ class PostableBehaviorTest extends CakeTestCase
 				'title' => false
 			)
 		));
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$expecting = array(
 			'Post' => array(
@@ -309,7 +309,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -323,7 +323,7 @@ class PostableBehaviorTest extends CakeTestCase
 				'title' => true
 			)
 		));
-		$this->_resaveFixtures($BookWithDefaultCallback);
+		$this->resaveFixtures($BookWithDefaultCallback);
 
 		$expecting = array(
 			'Post' => array(
@@ -344,7 +344,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -359,7 +359,7 @@ class PostableBehaviorTest extends CakeTestCase
 				'author' => true
 			)
 		));
-		$this->_resaveFixtures($BookWithDefaultCallback);
+		$this->resaveFixtures($BookWithDefaultCallback);
 
 		$expecting = array(
 			'Post' => array(
@@ -380,7 +380,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -396,7 +396,7 @@ class PostableBehaviorTest extends CakeTestCase
 			),
 			'mappingCallback' => 'nonDefaultMappingCallback'
 		));
-		$this->_resaveFixtures($BookWithNonDefaultCallback);
+		$this->resaveFixtures($BookWithNonDefaultCallback);
 
 		$expecting = array(
 			'Post' => array(
@@ -417,7 +417,7 @@ class PostableBehaviorTest extends CakeTestCase
 		// assign id since we aren't testing primary key assignment
 		$expecting['Post']['id'] = $result['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -429,7 +429,7 @@ class PostableBehaviorTest extends CakeTestCase
 		$BookWithInclusionCallback->Behaviors->load('Postable.Postable', array(
 			'inclusionCallback' => 'postableInclusionCallback'
 		));
-		$this->_resaveFixtures($BookWithInclusionCallback);
+		$this->resaveFixtures($BookWithInclusionCallback);
 
 		$expecting = array(
 			array(
@@ -447,12 +447,12 @@ class PostableBehaviorTest extends CakeTestCase
 		$result = $this->Post->find('all');
 
 		// inclusion callback only allows one record through during indexing
-		$this->assertEqual(count($result), 1);
+		$this->assertEquals(count($result), 1);
 
 		// assign id since we aren't testing primary key assignment
 		$expecting[0]['Post']['id'] = $result[0]['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -461,7 +461,7 @@ class PostableBehaviorTest extends CakeTestCase
 	public function testOnDeletionUpdate()
 	{
 		$this->Book->Behaviors->load('Postable.Postable');
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$find_query = array('conditions' => array(
 			'model' => 'Book',
@@ -470,7 +470,7 @@ class PostableBehaviorTest extends CakeTestCase
 
 		// test that a record is in the index
 		$before = $this->Post->find('first', $find_query);
-		$this->assertEqual($before['Post']['id'], 1);
+		$this->assertEquals($before['Post']['id'], 1);
 
 		// test that a record can be deleted
 		$this->assertTrue($this->Book->delete(1));
@@ -486,7 +486,7 @@ class PostableBehaviorTest extends CakeTestCase
 	public function testOnDeleteAllUpdate()
 	{
 		$this->Book->Behaviors->load('Postable.Postable');
-		$this->_resaveFixtures($this->Book);
+		$this->resaveFixtures($this->Book);
 
 		$find_query = array('conditions' => array(
 			'model' => 'Book',
@@ -495,7 +495,7 @@ class PostableBehaviorTest extends CakeTestCase
 
 		// test that a record is in the index
 		$before = $this->Post->find('first', $find_query);
-		$this->assertEqual($before['Post']['id'], 1);
+		$this->assertEquals($before['Post']['id'], 1);
 
 		// deleteAll with callbacks
 		$this->assertTrue($this->Book->deleteAll(array('1 = 1'), false, true));
@@ -515,8 +515,8 @@ class PostableBehaviorTest extends CakeTestCase
 		$this->Book->Behaviors->load('Postable.Postable');
 		$Report->Behaviors->load('Postable.Postable');
 
-		$this->_resaveFixtures($this->Book);
-		$this->_resaveFixtures($Report);
+		$this->resaveFixtures($this->Book);
+		$this->resaveFixtures($Report);
 
 		$expecting = array(
 			array(
@@ -553,7 +553,7 @@ class PostableBehaviorTest extends CakeTestCase
 		$expecting[0]['Post']['id'] = $result[0]['Post']['id'];
 		$expecting[1]['Post']['id'] = $result[1]['Post']['id'];
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -565,7 +565,7 @@ class PostableBehaviorTest extends CakeTestCase
 
 		// confirm we don't have any records before refreshing
 		$empty = $this->Post->find('all');
-		$this->assertEqual($empty, array());
+		$this->assertEquals($empty, array());
 
 		$expecting = array(
 			array(
@@ -607,7 +607,7 @@ class PostableBehaviorTest extends CakeTestCase
 
 		$result = $this->Post->find('all', array('order' => 'id'));
 
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 
 	/**
@@ -619,7 +619,7 @@ class PostableBehaviorTest extends CakeTestCase
 
 		// confirm we don't have any records before refreshing
 		$empty = $this->Post->find('all');
-		$this->assertEqual($empty, array());
+		$this->assertEquals($empty, array());
 
 		$expecting = array(
 			array(
@@ -660,6 +660,6 @@ class PostableBehaviorTest extends CakeTestCase
 		$this->Book->refreshPostableIndex();
 
 		$result = $this->Post->find('all', array('order' => 'id'));
-		$this->assertEqual($result, $expecting);
+		$this->assertEquals($result, $expecting);
 	}
 }
