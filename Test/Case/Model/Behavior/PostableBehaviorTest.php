@@ -3,8 +3,12 @@ App::uses('Model', 'Model');
 App::uses('AppModel', 'Model');
 require_once dirname(dirname(__FILE__)) . DS . 'models.php';
 
-class PostableBehaviorTest extends CakeTestCase {
-
+/**
+ * @property Model $Post
+ * @property Model $Book
+ */
+class PostableBehaviorTest extends CakeTestCase
+{
 	public $fixtures = array(
 		'plugin.postable.post',
 		'plugin.postable.book',
@@ -14,7 +18,8 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Method executed before each test
 	 */
-	public function startTest($method) {
+	public function startTest($method)
+	{
 		$this->Post =& new Post();
 		$this->Book =& new Book();
 	}
@@ -22,7 +27,8 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Method executed after each test
 	 */
-	public function endTest($method) {
+	public function endTest($method)
+	{
 		unset($this->Post);
 		unset($this->Book);
 
@@ -32,8 +38,11 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * To simplify options testing, we resave the fixtures triggering the
 	 * behavior to simulate a pre-populated storage model.
+	 *
+	 * @param Model $Model
 	 */
-	protected function _resaveFixtures(&$Model) {
+	protected function _resaveFixtures(&$Model)
+	{
 		$all_rows = $Model->find('all');
 		$Model->deleteAll(array('1 = 1'));
 		$Model->saveAll($all_rows);
@@ -44,21 +53,23 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Testing the utility function used by several test cases to ensure it
 	 * doesn't contribute to inconsistent test results.
 	 */
-	public function testResaveHelper() {
+	public function testResaveHelper()
+	{
 		$before = $this->Book->find('count');
 
 		$this->_resaveFixtures($this->Book);
 
 		$after = $this->Book->find('count');
 
-		$this->assertEqual($before,$after);
+		$this->assertEqual($before, $after);
 	}
 
 	/**
 	 * Tests the default behavior save + find, no options.
 	 */
-	public function testDefaultOptions() {
-		$this->Book->Behaviors->load('Postable.Postable',array());
+	public function testDefaultOptions()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array());
 		$this->_resaveFixtures($this->Book);
 
 		// only direct column name matches are recorded
@@ -73,9 +84,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'Book',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'Book',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -87,8 +98,9 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests that the storage model stays up to date following an edit.
 	 */
-	public function testSaveUpdate() {
-		$this->Book->Behaviors->load('Postable.Postable',array());
+	public function testSaveUpdate()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array());
 		$this->_resaveFixtures($this->Book);
 
 		$expecting = array(
@@ -109,11 +121,11 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$this->assertEqual($this->Book->save($updateData),$updateData);
+		$this->assertEqual($this->Book->save($updateData), $updateData);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'Book',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'Book',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -125,8 +137,9 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests that the storage model stays up to date following a saveAll.
 	 */
-	public function testSaveAllUpdate() {
-		$this->Book->Behaviors->load('Postable.Postable',array());
+	public function testSaveAllUpdate()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array());
 		$this->_resaveFixtures($this->Book);
 
 		// updates to existing record
@@ -172,12 +185,12 @@ class PostableBehaviorTest extends CakeTestCase {
 		$new_record_id = $this->Book->id;
 		$expecting[1]['Post']['foreign_key'] = $new_record_id;
 
-		$result = $this->Post->find('all',array(
-			'conditions'=>array(
-				'model'=>'Book',
-				'foreign_key'=>Set::extract('/Post/foreign_key',$expecting)
+		$result = $this->Post->find('all', array(
+			'conditions' => array(
+				'model' => 'Book',
+				'foreign_key' => Set::extract('/Post/foreign_key', $expecting)
 			),
-			'order'=>'foreign_key ASC'
+			'order' => 'foreign_key ASC'
 		));
 
 		// assign id since we aren't testing primary key assignment
@@ -190,8 +203,9 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the storageModel option.
 	 */
-	public function testStorageModelOption() {
-		$this->Book->Behaviors->load('Postable.Postable',array(
+	public function testStorageModelOption()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array(
 			'storageModel' => 'NonDefaultStorageModel'
 		));
 		$this->_resaveFixtures($this->Book);
@@ -208,9 +222,9 @@ class PostableBehaviorTest extends CakeTestCase {
 		);
 
 		$NonDefaultStorageModel =& new NonDefaultStorageModel();
-		$result = $NonDefaultStorageModel->find('first',array('conditions'=>array(
-			'model'=>'Book',
-			'id'=>1
+		$result = $NonDefaultStorageModel->find('first', array('conditions' => array(
+			'model' => 'Book',
+			'id' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -222,9 +236,10 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the detection of  minimum required columns for the storageModel
 	 */
-	public function testInvalidStorageModel() {
+	public function testInvalidStorageModel()
+	{
 		$this->expectExceptionMessage('does not have the required fields');
-		$this->Book->Behaviors->load('Postable.Postable',array(
+		$this->Book->Behaviors->load('Postable.Postable', array(
 			'storageModel' => 'InvalidStorageModel'
 		));
 	}
@@ -232,8 +247,9 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests basic column name-based mapping option.
 	 */
-	public function testNameMappingOption() {
-		$this->Book->Behaviors->load('Postable.Postable',array(
+	public function testNameMappingOption()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array(
 			'mapping' => array(
 				'region' => 'country'
 			)
@@ -251,9 +267,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'Book',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'Book',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -265,8 +281,9 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the column exclusion mapping option
 	 */
-	public function testMappingExclusionOption() {
-		$this->Book->Behaviors->load('Postable.Postable',array(
+	public function testMappingExclusionOption()
+	{
+		$this->Book->Behaviors->load('Postable.Postable', array(
 			'mapping' => array(
 				'title' => false
 			)
@@ -284,9 +301,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'Book',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'Book',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -294,12 +311,14 @@ class PostableBehaviorTest extends CakeTestCase {
 
 		$this->assertEqual($result, $expecting);
 	}
+
 	/**
 	 * Tests the column callback mapping option, when the column exists
 	 */
-	public function testMappingCallbackOptionColumnExists() {
+	public function testMappingCallbackOptionColumnExists()
+	{
 		$BookWithDefaultCallback =& new BookWithDefaultCallback();
-		$BookWithDefaultCallback->Behaviors->load('Postable.Postable',array(
+		$BookWithDefaultCallback->Behaviors->load('Postable.Postable', array(
 			'mapping' => array(
 				'title' => true
 			)
@@ -317,9 +336,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'BookWithDefaultCallback',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'BookWithDefaultCallback',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -332,9 +351,10 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the column callback mapping option, when the column doesn't exist,
 	 * simulating a "virtual column" possibility.
 	 */
-	public function testMappingCallbackOptionColumnDoesntExists() {
+	public function testMappingCallbackOptionColumnDoesntExists()
+	{
 		$BookWithDefaultCallback =& new BookWithDefaultCallback();
-		$BookWithDefaultCallback->Behaviors->load('Postable.Postable',array(
+		$BookWithDefaultCallback->Behaviors->load('Postable.Postable', array(
 			'mapping' => array(
 				'author' => true
 			)
@@ -352,9 +372,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'BookWithDefaultCallback',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'BookWithDefaultCallback',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -367,9 +387,10 @@ class PostableBehaviorTest extends CakeTestCase {
 	 * Tests the column callback mapping option, with a non default callback
 	 * name.
 	 */
-	public function testNonDefaultMappingCallbackOption() {
+	public function testNonDefaultMappingCallbackOption()
+	{
 		$BookWithNonDefaultCallback =& new BookWithNonDefaultCallback();
-		$BookWithNonDefaultCallback->Behaviors->load('Postable.Postable',array(
+		$BookWithNonDefaultCallback->Behaviors->load('Postable.Postable', array(
 			'mapping' => array(
 				'title' => true
 			),
@@ -388,9 +409,9 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('first',array('conditions'=>array(
-			'model'=>'BookWithDefaultCallback',
-			'foreign_key'=>1
+		$result = $this->Post->find('first', array('conditions' => array(
+			'model' => 'BookWithDefaultCallback',
+			'foreign_key' => 1
 		)));
 
 		// assign id since we aren't testing primary key assignment
@@ -402,9 +423,10 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the inclusionCallback option.
 	 */
-	public function testInclusionCallbackOption() {
+	public function testInclusionCallbackOption()
+	{
 		$BookWithInclusionCallback =& new BookWithInclusionCallback();
-		$BookWithInclusionCallback->Behaviors->load('Postable.Postable',array(
+		$BookWithInclusionCallback->Behaviors->load('Postable.Postable', array(
 			'inclusionCallback' => 'postableInclusionCallback'
 		));
 		$this->_resaveFixtures($BookWithInclusionCallback);
@@ -425,7 +447,7 @@ class PostableBehaviorTest extends CakeTestCase {
 		$result = $this->Post->find('all');
 
 		// inclusion callback only allows one record through during indexing
-		$this->assertEqual(count($result),1);
+		$this->assertEqual(count($result), 1);
 
 		// assign id since we aren't testing primary key assignment
 		$expecting[0]['Post']['id'] = $result[0]['Post']['id'];
@@ -436,55 +458,58 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the updating of the storage model on deletion.
 	 */
-	public function testOnDeletionUpdate() {
+	public function testOnDeletionUpdate()
+	{
 		$this->Book->Behaviors->load('Postable.Postable');
 		$this->_resaveFixtures($this->Book);
 
-		$find_query = array('conditions'=>array(
+		$find_query = array('conditions' => array(
 			'model' => 'Book',
 			'foreign_key' => 1
 		));
 
 		// test that a record is in the index
-		$before = $this->Post->find('first',$find_query);
-		$this->assertEqual($before['Post']['id'],1);
+		$before = $this->Post->find('first', $find_query);
+		$this->assertEqual($before['Post']['id'], 1);
 
 		// test that a record can be deleted
 		$this->assertTrue($this->Book->delete(1));
 
 		// test that the same query will now yeild no records
-		$after = $this->Post->find('first',$find_query);
+		$after = $this->Post->find('first', $find_query);
 		$this->assertEmpty($after);
 	}
 
 	/**
 	 * Tests the updating of the storage model on deletion via deleteAll
 	 */
-	public function testOnDeleteAllUpdate() {
+	public function testOnDeleteAllUpdate()
+	{
 		$this->Book->Behaviors->load('Postable.Postable');
 		$this->_resaveFixtures($this->Book);
 
-		$find_query = array('conditions'=>array(
+		$find_query = array('conditions' => array(
 			'model' => 'Book',
 			'foreign_key' => 1
 		));
 
 		// test that a record is in the index
-		$before = $this->Post->find('first',$find_query);
-		$this->assertEqual($before['Post']['id'],1);
+		$before = $this->Post->find('first', $find_query);
+		$this->assertEqual($before['Post']['id'], 1);
 
 		// deleteAll with callbacks
-		$this->assertTrue($this->Book->deleteAll(array('1 = 1'),false,true));
+		$this->assertTrue($this->Book->deleteAll(array('1 = 1'), false, true));
 
 		// test that the same query will now yeild no records
-		$after = $this->Post->find('first',$find_query);
+		$after = $this->Post->find('first', $find_query);
 		$this->assertEmpty($after);
 	}
 
 	/**
 	 * Tests the mixing of data from multiple models
 	 */
-	public function testMultipleModelMixing() {
+	public function testMultipleModelMixing()
+	{
 		$Report =& new Report();
 
 		$this->Book->Behaviors->load('Postable.Postable');
@@ -516,12 +541,12 @@ class PostableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$result = $this->Post->find('all',array(
-			'conditions'=>array(
-				'foreign_key'=>1,
-				'model'=>array('Book','Report')
+		$result = $this->Post->find('all', array(
+			'conditions' => array(
+				'foreign_key' => 1,
+				'model' => array('Book', 'Report')
 			),
-			'order'=>'model ASC'
+			'order' => 'model ASC'
 		));
 
 		// assign id since we aren't testing primary key assignment
@@ -534,7 +559,8 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the refreshing of the storage model data
 	 */
-	public function testRefreshPostableIndex() {
+	public function testRefreshPostableIndex()
+	{
 		$this->Book->Behaviors->load('Postable.Postable');
 
 		// confirm we don't have any records before refreshing
@@ -552,7 +578,7 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color One'
 				)
-        	),
+			),
 			array(
 				'Post' => array(
 					'id' => 2,
@@ -563,7 +589,7 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color Two'
 				)
-        	),
+			),
 			array(
 				'Post' => array(
 					'id' => 3,
@@ -574,12 +600,12 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color Three'
 				)
-        	),
-        );
+			),
+		);
 
 		$this->Book->refreshPostableIndex();
 
-		$result = $this->Post->find('all',array('order'=>'id'));
+		$result = $this->Post->find('all', array('order' => 'id'));
 
 		$this->assertEqual($result, $expecting);
 	}
@@ -587,7 +613,8 @@ class PostableBehaviorTest extends CakeTestCase {
 	/**
 	 * Tests the refreshing of the storage model data with a limit
 	 */
-	public function testRefreshPostableIndexWithLimit() {
+	public function testRefreshPostableIndexWithLimit()
+	{
 		$this->Book->Behaviors->load('Postable.Postable');
 
 		// confirm we don't have any records before refreshing
@@ -605,7 +632,7 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color One'
 				)
-        	),
+			),
 			array(
 				'Post' => array(
 					'id' => 2,
@@ -616,7 +643,7 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color Two'
 				)
-        	),
+			),
 			array(
 				'Post' => array(
 					'id' => 3,
@@ -627,13 +654,12 @@ class PostableBehaviorTest extends CakeTestCase {
 					'region' => '',
 					'color' => 'Color Three'
 				)
-        	),
-        );
+			),
+		);
 
 		$this->Book->refreshPostableIndex();
 
-		$result = $this->Post->find('all',array('order'=>'id'));
+		$result = $this->Post->find('all', array('order' => 'id'));
 		$this->assertEqual($result, $expecting);
 	}
 }
-?>
