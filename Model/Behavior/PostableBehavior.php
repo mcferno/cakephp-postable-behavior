@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CakePHP Postable Behavior
  * @author Patrick McFern <mcferno AT gmail.com>
@@ -44,12 +45,14 @@
  *
  *     The callback should return true (use) or false (omit)
  */
-class PostableBehavior extends ModelBehavior {
-
+class PostableBehavior extends ModelBehavior
+{
 	/**
 	 * Stores an instance of the Model which holds our abstracted copy of common
 	 * fields. Does not have to be an explicitly defined model as CakePHP can
 	 * generate one on the fly.
+	 *
+	 * @var Model
 	 */
 	public $storageModel = false;
 
@@ -58,17 +61,18 @@ class PostableBehavior extends ModelBehavior {
 	 * maintain a meaningful index.
 	 */
 	public $requiredBaseColumns = array(
-		'id','model','foreign_key'
+		'id', 'model', 'foreign_key'
 	);
 
-	public function setup(Model $Model, $settings = array()) {
+	public function setup(Model $Model, $settings = array())
+	{
 		if (!isset($this->settings[$Model->alias])) {
 
 			// default settings
 			$this->settings[$Model->alias] = array(
-				'storageModel'      => 'Post',
-				'mapping'           => array(),
-				'mappingCallback'   => 'postableMappingCallback',
+				'storageModel' => 'Post',
+				'mapping' => array(),
+				'mappingCallback' => 'postableMappingCallback',
 				'inclusionCallback' => null
 			);
 		}
@@ -83,7 +87,7 @@ class PostableBehavior extends ModelBehavior {
 		$this->storageModel = ClassRegistry::init($this->settings[$Model->alias]['storageModel']);
 
 		// verify that the storage model meets minimum requirements.
-		if(!$this->_validateStorageModel()) {
+		if (!$this->_validateStorageModel()) {
 			throw new Exception("Postable Behaviour :: Storage model {$this->settings[$Model->alias]['storageModel']} does not have the required fields");
 		}
 
@@ -91,17 +95,18 @@ class PostableBehavior extends ModelBehavior {
 		$defaultAssignment = $this->_getDefaultMapping();
 
 		// assign the mapping default, plus user defined overrides.
-		$this->settings[$Model->alias]['mapping'] = array_merge($defaultAssignment,$this->settings[$Model->alias]['mapping']);
+		$this->settings[$Model->alias]['mapping'] = array_merge($defaultAssignment, $this->settings[$Model->alias]['mapping']);
 	}
 
 	/**
-	 * Verfies that the storage model meets the minimum requirements to make
+	 * Verifies that the storage model meets the minimum requirements to make
 	 * proper use of this behavior.
 	 *
-	 * @return {Boolean} whether the storage model is valid
+	 * @return boolean whether the storage model is valid
 	 */
-	protected function _validateStorageModel() {
-		if(empty($this->storageModel)) {
+	protected function _validateStorageModel()
+	{
+		if (empty($this->storageModel)) {
 			return false;
 		}
 
@@ -110,7 +115,7 @@ class PostableBehavior extends ModelBehavior {
 		$requiredColumnKeys = array_flip($this->requiredBaseColumns);
 
 		// verify that none of the required columns are missing
-		if(count(array_intersect_key($schema,$requiredColumnKeys)) !== count($requiredColumnKeys)) {
+		if (count(array_intersect_key($schema, $requiredColumnKeys)) !== count($requiredColumnKeys)) {
 			return false;
 		}
 
@@ -121,14 +126,15 @@ class PostableBehavior extends ModelBehavior {
 	 * Inspects the storage model and obtains a list of column names which will
 	 * group our data
 	 */
-	protected function _getDefaultMapping() {
+	protected function _getDefaultMapping()
+	{
 		$schema = $this->storageModel->schema();
 
 		// remove all columns which are required (and not used for comparison)
-		$whitelist = array_diff_key($schema,array_flip($this->requiredBaseColumns));
+		$whitelist = array_diff_key($schema, array_flip($this->requiredBaseColumns));
 
 		// format the list of columns into an associative array ( 'key' => 'key' )
-		return array_combine(array_keys($whitelist),array_keys($whitelist));
+		return array_combine(array_keys($whitelist), array_keys($whitelist));
 	}
 
 	/**
@@ -136,25 +142,25 @@ class PostableBehavior extends ModelBehavior {
 	 * storage model. Depending on the plugin settings, a field may be omitted,
 	 * mapped via callback, or mapped via field name.
 	 *
-	 * @param {Model} $Model containing a populated this->data
-	 * @return {Array} mapped data
+	 * @param Model $Model containing a populated this->data
+	 * @return array mapped data
 	 */
-	protected function _assignFields($Model) {
-
+	protected function _assignFields($Model)
+	{
 		$data = array();
 
-		foreach($this->settings[$Model->alias]['mapping'] as $storageKey=>$mappingField) {
+		foreach ($this->settings[$Model->alias]['mapping'] as $storageKey => $mappingField) {
 			// field is not to be stored
-			if($mappingField === false) {
+			if ($mappingField === false) {
 				continue;
 
 			// field is handled by callback
-			} elseif($mappingField === true && method_exists($Model,$this->settings[$Model->alias]['mappingCallback'])) {
+			} elseif ($mappingField === true && method_exists($Model, $this->settings[$Model->alias]['mappingCallback'])) {
 				$data[$storageKey] = $Model->{$this->settings[$Model->alias]['mappingCallback']}($storageKey, $Model->data);
 
 			// field is mapped using the default approach
 			} else {
-				if(isset($Model->data[$Model->alias][$mappingField])) {
+				if (isset($Model->data[$Model->alias][$mappingField])) {
 					$data[$storageKey] = $Model->data[$Model->alias][$mappingField];
 				}
 			}
@@ -166,23 +172,23 @@ class PostableBehavior extends ModelBehavior {
 	/**
 	 * Updates the stoage model data to maintain data freshness.
 	 *
-	 * @param {Model} $Model
-	 * @param {boolean} $created Whether this is a save or an update
+	 * @param Model $Model
+	 * @param boolean $created Whether this is a save or an update
 	 */
-	public function afterSave(Model $Model, $created, $options = array()) {
-
+	public function afterSave(Model $Model, $created, $options = array())
+	{
 		// verify if an inclusion callback has been set and exists for this model
-		if(isset($this->settings[$Model->alias]['inclusionCallback']) && method_exists($Model,$this->settings[$Model->alias]['inclusionCallback'])) {
+		if (isset($this->settings[$Model->alias]['inclusionCallback']) && method_exists($Model, $this->settings[$Model->alias]['inclusionCallback'])) {
 
 			// halt execution if this record is to be omitted.
-			if($Model->{$this->settings[$Model->alias]['inclusionCallback']}($Model->data) === false) {
+			if ($Model->{$this->settings[$Model->alias]['inclusionCallback']}($Model->data) === false) {
 				return;
 			}
 		}
 
 		// convert the record data into a saveable format.
 		$data = $this->_assignFields($Model);
-		if(empty($data)) {
+		if (empty($data)) {
 			return;
 		}
 
@@ -191,16 +197,16 @@ class PostableBehavior extends ModelBehavior {
 		$data['foreign_key'] = $Model->id;
 
 		// if this is not new data, update the existing entry
-		if(!$created) {
-			$existing = $this->storageModel->find('first',array(
-				'conditions'=>array(
-					'model'=>$Model->alias,
-					'foreign_key'=>$Model->id
+		if (!$created) {
+			$existing = $this->storageModel->find('first', array(
+				'conditions' => array(
+					'model' => $Model->alias,
+					'foreign_key' => $Model->id
 				),
-				'recursive'=>-1
+				'recursive' => -1
 			));
 
-			if(!empty($existing[$this->storageModel->alias]['id'])) {
+			if (!empty($existing[$this->storageModel->alias]['id'])) {
 				$data['id'] = $existing[$this->storageModel->alias]['id'];
 			}
 		}
@@ -215,19 +221,19 @@ class PostableBehavior extends ModelBehavior {
 	 *
 	 * @param {Model} $Model we're operating on.
 	 */
-	public function afterDelete(Model $Model) {
-
+	public function afterDelete(Model $Model)
+	{
 		// obtain the record from the storage model, if this deleted record was being indexed.
-		$existing = $this->storageModel->find('first',array(
-			'conditions'=>array(
-				'model'=>$Model->alias,
-				'foreign_key'=>$Model->id
+		$existing = $this->storageModel->find('first', array(
+			'conditions' => array(
+				'model' => $Model->alias,
+				'foreign_key' => $Model->id
 			),
-			'recursive'=>-1
+			'recursive' => -1
 		));
 
 		// if we found a match, delete it.
-		if(!empty($existing[$this->storageModel->alias]['id'])) {
+		if (!empty($existing[$this->storageModel->alias]['id'])) {
 			$this->storageModel->delete($existing[$this->storageModel->alias]['id']);
 		}
 	}
@@ -239,34 +245,34 @@ class PostableBehavior extends ModelBehavior {
 	 *
 	 * This is a costly operation and should be used seldomly.
 	 *
-	 * @param {Model} $Model we're operating on.
-	 * @param {Integer} $limit the number of records to process at once
+	 * @param Model $Model we're operating on.
+	 * @param Integer $limit the number of records to process at once
 	 */
-	public function refreshPostableIndex($Model, $limit = false) {
-
+	public function refreshPostableIndex($Model, $limit = false)
+	{
 		// remove all currently indexed data for this model
-		if($this->storageModel->deleteAll("`{$this->storageModel->alias}`.`model` = '{$Model->alias}'")) {
+		if ($this->storageModel->deleteAll("`{$this->storageModel->alias}`.`model` = '{$Model->alias}'")) {
 
 			$numRows = $Model->find('count');
 
 			// nothing to re-index, early success
-			if($numRows === 0) {
+			if ($numRows === 0) {
 				return true;
 			}
 
 			$numProcessed = 0;
 
-			while($numRows > 0) {
+			while ($numRows > 0) {
 
 				$options = array();
-				if($limit !== false) {
+				if ($limit !== false) {
 					$options['limit'] = "{$numProcessed},{$limit}";
 				}
 
 				// rebuild the index by simulating an afterSave for all records
-				$records = $Model->find('all',$options);
+				$records = $Model->find('all', $options);
 
-				foreach($records as &$record) {
+				foreach ($records as &$record) {
 					$Model->create();
 					$Model->set($record[$Model->alias]);
 
