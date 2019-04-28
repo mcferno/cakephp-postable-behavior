@@ -1,0 +1,16 @@
+{
+	"name": "mcferno/cakephp-postable-behavior",
+	"description": "Model Behavior for CakePHP",
+	"type": "cakephp-plugin",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Patrick McFern",
+			"email": "mcferno@gmail.com",
+			"homepage": "https://mcferno.com"
+		}
+	],
+	"extra": {
+		"installer-name": "Postable"
+	}
+}
