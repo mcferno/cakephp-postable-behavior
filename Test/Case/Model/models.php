@@ -5,54 +5,54 @@
  */
 
 class BookWithDefaultCallback extends CakeTestModel {
-	var $name = 'BookWithDefaultCallback';
-	var $useTable = 'books';
-		
+	public $name = 'BookWithDefaultCallback';
+	public $useTable = 'books';
+
 	public function postableMappingCallback($field, &$data) {
 		return 'DefaultCallbackMapping';
 	}
 }
 
 class BookWithNonDefaultCallback extends CakeTestModel {
-	var $name = 'BookWithDefaultCallback';
-	var $useTable = 'books';
-		
+	public $name = 'BookWithDefaultCallback';
+	public $useTable = 'books';
+
 	public function nonDefaultMappingCallback($field, &$data) {
 		return 'NonDefaultMappingCallback';
 	}
 }
 
 class BookWithInclusionCallback extends CakeTestModel {
-	var $name = 'BookWithInclusionCallback';
-	var $useTable = 'books';
-	
+	public $name = 'BookWithInclusionCallback';
+	public $useTable = 'books';
+
 	public function postableInclusionCallback(&$data) {
 		return (bool)($data['BookWithInclusionCallback']['title'] == 'Title One');
 	}
 }
 
 class NonDefaultStorageModel extends CakeTestModel {
-	var $name = 'NonDefaultStorageModel';
-	var $useTable = 'posts';
+	public $name = 'NonDefaultStorageModel';
+	public $useTable = 'posts';
 }
 
 class InvalidStorageModel extends CakeTestModel {
 
-	var $name = 'InvalidStorageModel';
-	var $useTable = false;
+	public $name = 'InvalidStorageModel';
+	public $useTable = false;
 
-	var $_schema = array(
+	protected $_schema = array(
 		'id'=> array('type' => 'integer', 'null' => '', 'default' => '1', 'length' => '8', 'key'=>'primary')
 	);
 }
 
 class Post extends CakeTestModel {
-	var $name = 'Post';
+	public $name = 'Post';
 }
 class Book extends CakeTestModel {
-	var $name = 'Book';
+	public $name = 'Book';
 }
 class Report extends CakeTestModel {
-	var $name = 'Report';
+	public $name = 'Report';
 }
 ?>
