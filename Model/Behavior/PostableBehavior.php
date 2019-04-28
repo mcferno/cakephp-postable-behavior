@@ -87,12 +87,12 @@ class PostableBehavior extends ModelBehavior
 		$this->storageModel = ClassRegistry::init($this->settings[$Model->alias]['storageModel']);
 
 		// verify that the storage model meets minimum requirements.
-		if (!$this->_validateStorageModel()) {
+		if (!$this->validateStorageModel()) {
 			throw new Exception("Postable Behaviour :: Storage model {$this->settings[$Model->alias]['storageModel']} does not have the required fields");
 		}
 
 		// default list of columns to record in our storage model.
-		$defaultAssignment = $this->_getDefaultMapping();
+		$defaultAssignment = $this->getDefaultMapping();
 
 		// assign the mapping default, plus user defined overrides.
 		$this->settings[$Model->alias]['mapping'] = array_merge($defaultAssignment, $this->settings[$Model->alias]['mapping']);
@@ -104,7 +104,7 @@ class PostableBehavior extends ModelBehavior
 	 *
 	 * @return boolean whether the storage model is valid
 	 */
-	protected function _validateStorageModel()
+	protected function validateStorageModel()
 	{
 		if (empty($this->storageModel)) {
 			return false;
@@ -126,7 +126,7 @@ class PostableBehavior extends ModelBehavior
 	 * Inspects the storage model and obtains a list of column names which will
 	 * group our data
 	 */
-	protected function _getDefaultMapping()
+	protected function getDefaultMapping()
 	{
 		$schema = $this->storageModel->schema();
 
@@ -145,7 +145,7 @@ class PostableBehavior extends ModelBehavior
 	 * @param Model $Model containing a populated this->data
 	 * @return array mapped data
 	 */
-	protected function _assignFields($Model)
+	protected function assignFields($Model)
 	{
 		$data = array();
 
@@ -187,7 +187,7 @@ class PostableBehavior extends ModelBehavior
 		}
 
 		// convert the record data into a saveable format.
-		$data = $this->_assignFields($Model);
+		$data = $this->assignFields($Model);
 		if (empty($data)) {
 			return;
 		}
